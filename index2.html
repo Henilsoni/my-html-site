@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record or Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background-color: #28a745;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #recording-controls {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Choose an Action</h1>
+    <p>Select whether you want to record or upload a file:</p>
+
+    <button id="record-option">Record Audio</button>
+    <button id="upload-option">Upload File</button>
+
+    <!-- Recording Controls -->
+    <div id="recording-controls">
+        <button id="start-recording">Start Recording</button>
+        <button id="pause-recording">Pause Recording</button>
+        <button id="stop-recording">Stop Recording</button>
+        <p id="recording-status"></p>
+        <audio id="recorded-audio" controls></audio>
+    </div>
+
+    <!-- File Upload Form -->
+    <div id="upload-controls" style="display: none;">
+        <input type="file" id="file-input">
+        <button id="upload-file">Upload File</button>
+    </div>
+
+    <script>
+        const recordOptionBtn = document.getElementById('record-option');
+        const uploadOptionBtn = document.getElementById('upload-option');
+        const recordingControls = document.getElementById('recording-controls');
+        const uploadControls = document.getElementById('upload-controls');
+        const startRecordingBtn = document.getElementById('start-recording');
+        const pauseRecordingBtn = document.getElementById('pause-recording');
+        const stopRecordingBtn = document.getElementById('stop-recording');
+        const fileInput = document.getElementById('file-input');
+        const uploadFileBtn = document.getElementById('upload-file');
+        const recordedAudio = document.getElementById('recorded-audio');
+        const recordingStatus = document.getElementById('recording-status');
+
+        let mediaRecorder;
+        let audioChunks = [];
+
+        // Handle record option
+        recordOptionBtn.addEventListener('click', () => {
+            recordingControls.style.display = 'block';
+            uploadControls.style.display = 'none';
+        });
+
+        // Handle upload option
+        uploadOptionBtn.addEventListener('click', () => {
+            uploadControls.style.display = 'block';
+            recordingControls.style.display = 'none';
+        });
+
+        // Start recording
+        startRecordingBtn.addEventListener('click', async () => {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioURL = URL.createObjectURL(audioBlob);
+                    recordedAudio.src = audioURL;
+                    // Upload the audioBlob file automatically to Google Drive or email
+                    uploadToDrive(audioBlob, 'recorded-audio.wav');
+                    recordingStatus.textContent = 'Recording stopped and file is uploading...';
+                };
+
+                audioChunks = [];
+                mediaRecorder.start();
+                recordingStatus.textContent = 'Recording started...';
+            }
+        });
+
+        // Pause recording
+        pauseRecordingBtn.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.pause();
+                recordingStatus.textContent = 'Recording paused...';
+            }
+        });
+
+        // Stop recording
+        stopRecordingBtn.addEventListener('click', () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+        });
+
+        // Handle file upload
+        uploadFileBtn.addEventListener('click', () => {
+            const file = fileInput.files[0];
+            if (file) {
+                uploadToDrive(file, file.name);
+                alert('File uploading in background...');
+            }
+        });
+
+        // Function to upload file to Google Drive
+        function uploadToDrive(file, filename) {
+            // Implement the API call to upload file to Google Drive
+            // You would use Google Drive API with OAuth2.0 credentials in this step.
+            console.log('Uploading file:', filename);
+        }
+    </script>
+</body>
+</html>
