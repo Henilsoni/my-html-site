@@ -82,7 +82,7 @@
         <p id="surprise-msg">Have the best birthday ever!</p>
         
         <!-- New button to open another HTML or file -->
-        <button id="open-file-btn" style="display:none;" onclick="openFile()">Open Another Surprise!</button>
+        
         
     </div>
 
@@ -155,24 +155,10 @@
         }
 
         // Function to create a falling petal
-        function createPetal() {
-            const petal = document.createElement('div');
-            petal.className = 'petal';
-            petal.style.left = Math.random() * 100 + 'vw'; // Random horizontal position
-            petal.style.animationDuration = Math.random() * 3 + 2 + 's'; // Random duration between 2s and 5s
-            petal.style.animationName = 'fall';
-            petal.style.transform = `translateY(-${Math.random() * 50 + 50}px) translateX(${Math.random() * 30 - 15}px)`; // Initial upward position and slight horizontal movement
-            document.body.appendChild(petal);
-
-            // Remove the petal after falling
-            petal.addEventListener('animationend', function() {
-                petal.remove();
-            });
-        }
 
         // Function to open another HTML or file
         function openFile() {
-            window.location.href = 'anotherpage.html'; // Redirects to another HTML page or file
+            window.location.href = 'login.html'; // Redirects to another HTML page or file
         }
     </script>
 </body>
